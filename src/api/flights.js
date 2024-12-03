@@ -33,11 +33,7 @@ const ApiService = {
         },
       });
 
-      console.log("Search Airport API Response:", response.data);
-
-      // Check if the response contains data
       if (response.data.status && response.data.data.length > 0) {
-        // Logic to choose the most relevant entity
         const relevantEntry = response.data.data.find(
           (item) =>
             item.skyId === query.toUpperCase() ||
@@ -45,7 +41,7 @@ const ApiService = {
         );
 
         if (relevantEntry) {
-          return relevantEntry.navigation.entityId; // Return the relevant entityId
+          return relevantEntry.navigation.entityId;
         } else {
           throw new Error(
             `No matching airport found for "${query}". Please refine your search.`
@@ -67,6 +63,7 @@ const ApiService = {
 
   /**
    * Search for flights using skyId and entityId for origin and destination.
+   * This implementation fetches origin and destination `entityId` concurrently.
    * @param {object} params - The search parameters for the flights API.
    * @returns {Promise<object>} - The flight search results.
    */
@@ -90,11 +87,11 @@ const ApiService = {
     }
 
     try {
-      // Fetch entityId for origin and destination
-      const originEntityId = await ApiService.searchAirport(originSkyId);
-      const destinationEntityId = await ApiService.searchAirport(
-        destinationSkyId
-      );
+      // Concurrently fetch origin and destination entityIds
+      const [originEntityId, destinationEntityId] = await Promise.all([
+        ApiService.searchAirport(originSkyId),
+        ApiService.searchAirport(destinationSkyId),
+      ]);
 
       // Call the searchFlights API
       const response = await axiosInstance.get("/searchFlights", {
@@ -114,8 +111,6 @@ const ApiService = {
           market,
         },
       });
-
-      console.log("Flight Search Response:", response.data);
       return response.data;
     } catch (error) {
       console.error(
