@@ -1,72 +1,92 @@
 import React from "react";
 
-function FlightResults({ flights, loading }) {
+function FlightResults({ flights, loading, searchDate }) {
+  console.log(flights, loading, searchDate);
+  const filteredFlights = flights.filter((flight) => {
+    const flightDate = new Date(flight.legs[0].departure)
+      .toISOString()
+      .split("T")[0];
+    return flightDate === searchDate; // Ensure same format
+  });
+
   if (loading) {
     return <div className="text-center">Loading...</div>;
   }
 
-  if (!flights || flights.length === 0) {
+  if (!filteredFlights || filteredFlights.length === 0) {
     return (
       <div className="text-center text-muted">
-        No flights found. Try another search!
+        No flights found for the selected date.
       </div>
     );
   }
 
   return (
     <div>
-      <h2 className="text-center">Available Flights</h2>
-      <div className="row">
-        {flights.map((flight, index) => (
-          <div key={index} className="col-md-6 mb-4">
-            <div className="card shadow-sm">
-              <div className="card-body">
-                <h5 className="card-title">
-                  {flight.legs[0].origin.name} (
-                  {flight.legs[0].origin.displayCode}) →{" "}
-                  {flight.legs[0].destination.name} (
-                  {flight.legs[0].destination.displayCode})
+      <h2 className="text-center mb-4">Available Flights</h2>
+      <div className="list-group">
+        {filteredFlights.map((flight, index) => (
+          <div key={index} className="list-group-item p-4 mb-3 shadow-sm">
+            <div className="d-flex justify-content-between align-items-center">
+              {/* Flight timing and duration */}
+              <div>
+                <h5 className="mb-0">
+                  {new Date(flight.legs[0].departure).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}{" "}
+                  –{" "}
+                  {new Date(flight.legs[0].arrival).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </h5>
-                <p className="card-text">
-                  <strong>Price:</strong> {flight.price.formatted}
-                </p>
-                <p className="card-text">
-                  <strong>Departure:</strong>{" "}
-                  {new Date(flight.legs[0].departure).toLocaleString()}
-                </p>
-                <p className="card-text">
-                  <strong>Arrival:</strong>{" "}
-                  {new Date(flight.legs[0].arrival).toLocaleString()}
-                </p>
-                <p className="card-text">
-                  <strong>Duration:</strong>{" "}
+                <small>
                   {Math.floor(flight.legs[0].durationInMinutes / 60)}h{" "}
                   {flight.legs[0].durationInMinutes % 60}m
-                </p>
-                <p className="card-text">
-                  <strong>Stops:</strong>{" "}
-                  {flight.legs[0].stopCount === 0
-                    ? "Direct"
-                    : flight.legs[0].stopCount}
-                </p>
-                <p className="card-text">
-                  <strong>Airlines:</strong>
-                </p>
-                <ul>
-                  {flight.legs[0].carriers.marketing.map((carrier, idx) => (
-                    <li key={idx}>
-                      <img
-                        src={carrier.logoUrl}
-                        alt={carrier.name}
-                        className="me-2"
-                        style={{ width: "20px" }}
-                      />
-                      {carrier.name}
-                    </li>
-                  ))}
-                </ul>
+                </small>
+              </div>
+
+              {/* Stops */}
+              <div>
+                {flight.legs[0].stopCount === 0 ? (
+                  <span>Nonstop</span>
+                ) : (
+                  <span>{flight.legs[0].stopCount} stop(s)</span>
+                )}
+              </div>
+
+              {/* Price */}
+              <div>
+                <h5 className="text-success">{flight.price.formatted}</h5>
               </div>
             </div>
+
+            {/* Additional details */}
+            <div className="mt-3 d-flex justify-content-between align-items-center">
+              <div>
+                <strong>{flight.legs[0].origin.displayCode}</strong> →{" "}
+                <strong>{flight.legs[0].destination.displayCode}</strong>
+              </div>
+              <div>
+                <img
+                  src={flight.legs[0].carriers.marketing[0].logoUrl}
+                  alt={flight.legs[0].carriers.marketing[0].name}
+                  className="me-2"
+                  style={{ width: "30px" }}
+                />
+                {flight.legs[0].carriers.marketing[0].name}
+              </div>
+            </div>
+
+            {/* CO2 emission (optional) */}
+            {flight.eco?.ecoContenderDelta && (
+              <div className="mt-2 text-muted">
+                Avoids as much CO2 as{" "}
+                <strong>{flight.eco.ecoContenderDelta} trees</strong> absorb in
+                a day
+              </div>
+            )}
           </div>
         ))}
       </div>

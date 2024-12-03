@@ -4,17 +4,12 @@ function SearchBar({ onSearch }) {
   const [formData, setFormData] = useState({
     originSkyId: "",
     destinationSkyId: "",
-    originEntityId: "",
-    destinationEntityId: "",
-    date: "",
-    returnDate: "",
+    date: "", // Required departure date
+    returnDate: "", // Optional return date
     cabinClass: "economy",
     adults: 1,
     childrens: 0,
     infants: 0,
-    sortBy: "best",
-    currency: "USD",
-    market: "en-US",
   });
 
   const handleChange = (e) => {
@@ -22,24 +17,12 @@ function SearchBar({ onSearch }) {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const {
-      originSkyId,
-      destinationSkyId,
-      originEntityId,
-      destinationEntityId,
-      date,
-    } = formData;
+    const { originSkyId, destinationSkyId, date } = formData;
 
-    if (
-      !originSkyId ||
-      !destinationSkyId ||
-      !originEntityId ||
-      !destinationEntityId ||
-      !date
-    ) {
+    if (!originSkyId || !destinationSkyId || !date) {
       alert("Please fill out all required fields.");
       return;
     }
@@ -50,73 +33,72 @@ function SearchBar({ onSearch }) {
   return (
     <form onSubmit={handleSubmit} className="p-4 border rounded bg-light">
       <div className="row">
-        <div className="col-md-4 mb-3">
+        {/* Origin SkyId */}
+        <div className="col-md-6 mb-3">
+          <label htmlFor="originSkyId" className="form-label">
+            Origin SkyId <span className="text-danger">*</span>
+          </label>
           <input
             type="text"
             name="originSkyId"
-            placeholder="Origin SkyId"
+            id="originSkyId"
+            placeholder="Enter origin city or airport"
             value={formData.originSkyId}
             onChange={handleChange}
             className="form-control"
             required
           />
         </div>
-        <div className="col-md-4 mb-3">
+
+        {/* Destination SkyId */}
+        <div className="col-md-6 mb-3">
+          <label htmlFor="destinationSkyId" className="form-label">
+            Destination SkyId <span className="text-danger">*</span>
+          </label>
           <input
             type="text"
             name="destinationSkyId"
-            placeholder="Destination SkyId"
+            id="destinationSkyId"
+            placeholder="Enter destination city or airport"
             value={formData.destinationSkyId}
             onChange={handleChange}
             className="form-control"
             required
           />
         </div>
-        <div className="col-md-4 mb-3">
+
+        {/* Departure Date */}
+        <div className="col-md-6 mb-3">
+          <label htmlFor="date" className="form-label">
+            Departure Date <span className="text-danger">*</span>
+          </label>
           <input
             type="date"
             name="date"
+            id="date"
             value={formData.date}
             onChange={handleChange}
             className="form-control"
             required
           />
         </div>
-      </div>
-      <div className="row">
-        <div className="col-md-4 mb-3">
-          <input
-            type="text"
-            name="originEntityId"
-            placeholder="Origin Entity ID"
-            value={formData.originEntityId}
-            onChange={handleChange}
-            className="form-control"
-            required
-          />
-        </div>
-        <div className="col-md-4 mb-3">
-          <input
-            type="text"
-            name="destinationEntityId"
-            placeholder="Destination Entity ID"
-            value={formData.destinationEntityId}
-            onChange={handleChange}
-            className="form-control"
-            required
-          />
-        </div>
-        <div className="col-md-4 mb-3">
+
+        {/* Return Date */}
+        <div className="col-md-6 mb-3">
+          <label htmlFor="returnDate" className="form-label">
+            Return Date (Optional)
+          </label>
           <input
             type="date"
             name="returnDate"
-            placeholder="Return Date"
+            id="returnDate"
             value={formData.returnDate}
             onChange={handleChange}
             className="form-control"
           />
         </div>
       </div>
+
       <button type="submit" className="btn btn-primary w-100">
         Search Flights
       </button>
