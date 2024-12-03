@@ -28,7 +28,7 @@ function App() {
 
       // Call the searchFlights API
       const flightsData = await ApiService.searchFlights(searchParams);
-      console.log("flightsData", flightsData);
+
       setFlights(flightsData.data.itineraries || []);
     } catch (error) {
       console.error("Error searching for flights:", error.message);
