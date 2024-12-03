@@ -25,7 +25,7 @@ function App() {
 
   return (
     <div className="container my-4">
-      <h1 className="text-center mb-4">Google Flights Clone</h1>
+      <h1 className="text-center mb-4">Google Flights</h1>
       <div className="row">
         <div className="col-12 mb-4">
           <SearchBar onSearch={handleSearch} />
